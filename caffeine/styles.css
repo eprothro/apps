@@ -103,15 +103,15 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  flex: 2.15 1 0;
+  flex: 1.55 1 0;
 }
 
 .panel:not(.clear-panel) {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .clear-panel {
-  flex: 0.78 1 0;
+  flex: 1.2 1 0;
   background: #181410;
 }
 
@@ -246,7 +246,7 @@ body {
 }
 
 .flip-back dt {
-  margin: 14px 0 5px;
+  margin: 12px 0 4px;
   font-family: var(--serif);
   font-size: clamp(16px, 4.8vw, 22px);
   font-weight: 500;
@@ -326,15 +326,16 @@ body {
 }
 
 .dose-hud {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  flex: 0 0 auto;
+  height: 28px;
   pointer-events: none;
 }
 
 .dose-pill {
   position: absolute;
-  top: 6px;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
   padding: 5px 11px;
   border-radius: 999px;
   background: var(--mark);
@@ -397,6 +398,29 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
   white-space: nowrap;
+}
+
+.sleep-band-label,
+.quiet-label {
+  position: absolute;
+  transform: translateX(-50%);
+  color: rgba(244, 238, 228, 0.62);
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.sleep-band-label {
+  font-size: 11px;
+}
+
+.quiet-label {
+  transform: translate(-50%, -130%);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
 #clear-axis {
@@ -488,7 +512,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .stepper button,
@@ -502,9 +526,11 @@ body {
 }
 
 .stepper button {
+  flex: 0 0 48px;
   width: 48px;
   font-size: 24px;
   line-height: 1;
+  padding: 0;
 }
 
 .stepper-value {
@@ -512,23 +538,34 @@ body {
   align-items: baseline;
   justify-content: center;
   gap: 8px;
-  min-width: 140px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .stepper-value input {
-  width: 96px;
+  width: 3.15em;
+  min-width: 3.15em;
   border: 0;
+  padding: 0;
   background: transparent;
   color: var(--ink);
   font-family: var(--serif);
-  font-size: 44px;
+  font-size: clamp(36px, 11vw, 44px);
   font-weight: 500;
   letter-spacing: -0.03em;
   text-align: right;
   font-variant-numeric: tabular-nums;
+  appearance: textfield;
+  -webkit-appearance: none;
 }
 
-.stepper-value span,
+.stepper-value input::-webkit-outer-spin-button,
+.stepper-value input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stepper-value input + span,
 .meta {
   color: var(--muted);
   font-size: 14px;
@@ -541,12 +578,16 @@ body {
 }
 
 .stepper-clock {
+  display: block;
+  min-width: 0;
   font-family: var(--serif);
-  font-size: clamp(28px, 7vw, 36px);
+  font-size: clamp(26px, 8vw, 34px);
   font-weight: 500;
   letter-spacing: -0.03em;
   line-height: 1;
   color: var(--ink);
+  text-align: center;
+  white-space: nowrap;
 }
 
 .editor-split .chips {
@@ -556,8 +597,17 @@ body {
   padding-right: 0;
 }
 
+.editor-split .stepper {
+  gap: 6px;
+}
+
 .editor-split .stepper button {
-  width: 40px;
+  flex: 0 0 44px;
+  width: 44px;
+}
+
+.editor-split .stepper-value {
+  min-width: 0;
 }
 
 .chips {
@@ -643,13 +693,12 @@ input[type="time"] {
 
 .tray-item strong {
   max-width: 100%;
-  overflow: hidden;
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: clamp(15px, 4.6vw, 18px);
   font-weight: 500;
   letter-spacing: -0.02em;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
 }
 
 .tray-item span {

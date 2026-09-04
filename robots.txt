@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://eprothro.github.io/apps/sitemap.xml

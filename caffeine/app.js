@@ -29,6 +29,12 @@ const AGE_PRESETS = [
   { id: "10", label: "10", age: 10 },
   { id: "13", label: "13", age: 13 },
   { id: "16", label: "16", age: 16 },
+  { id: "18", label: "18", age: 18 },
+  { id: "30", label: "30", age: 30 },
+  { id: "40", label: "40", age: 40 },
+  { id: "50", label: "50", age: 50 },
+  { id: "60", label: "60", age: 60 },
+  { id: "70", label: "70", age: 70 },
 ];
 
 const WEIGHT_PRESETS = [
@@ -38,6 +44,9 @@ const WEIGHT_PRESETS = [
   { id: "170", label: "170 lb", lb: 170 },
   { id: "200", label: "200 lb", lb: 200 },
   { id: "225", label: "225 lb", lb: 225 },
+  { id: "250", label: "250 lb", lb: 250 },
+  { id: "270", label: "270 lb", lb: 270 },
+  { id: "300", label: "300 lb", lb: 300 },
 ];
 
 const CONSUME_PRESETS = [
@@ -75,12 +84,12 @@ function studyKg(mg, kg = STUDY_KG) {
 
 const NOTE_MGKG = {
   alertness: {
-    from: studyKg(90),
+    from: 0.5,
     to: studyKg(180),
   },
   cognition: {
-    betterLo: studyKg(180),
-    betterHi: studyKg(250),
+    from: 0.5,
+    best: 2.5,
     memoryFail: studyKg(450),
   },
   endurance: {
@@ -95,8 +104,8 @@ const NOTE_MGKG = {
     nearMax: 9,
   },
   mood: {
-    goodLo: studyKg(150),
-    goodHi: studyKg(250),
+    goodLo: 1.0,
+    goodHi: studyKg(150),
     turnDown: studyKg(300),
     tense: studyKg(450),
   },
@@ -105,7 +114,6 @@ const NOTE_MGKG = {
     bigger: studyKg(250),
   },
   anxiety: {
-    none: studyKg(50),
     some: studyKg(150),
     most: studyKg(450),
   },
@@ -148,7 +156,7 @@ function mgPerKg() {
 }
 
 function typicalLb(age) {
-  if (age >= 18) return 185;
+  if (age >= 18) return 154;
   return TYPICAL[clamp(Math.round(age), 8, 17)];
 }
 
@@ -180,8 +188,8 @@ function sigmoid(x, mid, steep) {
 }
 
 function cognitionAt(x) {
-  const raw = hill(x, 1.2, 2) - 1.35 * hill(x, 5.8, 2.9);
-  return clamp(raw / 0.705, 0, 1);
+  const raw = hill(x, 1.2, 2) - 1.9 * hill(x, 6.4, 3);
+  return clamp(raw / 0.7059, 0, 1);
 }
 
 function effectAt(id, x) {
@@ -200,15 +208,15 @@ function effectAt(id, x) {
         1,
       );
     case "mood":
-      return pulse(x, 0.9, 2.2, 1.35);
+      return pulse(x, 0.9, 2.2, 1.0);
     case "jitters":
       return sigmoid(x, 2.6, 1.25);
     case "anxiety":
-      return sigmoid(x, youth ? 3.7 : 4.5, 1.15);
+      return sigmoid(x, youth ? 3.7 : 4.5, youth ? 1.15 * (4.5 / 3.7) : 1.15);
     case "heart":
       return clamp(
         0.4 * hill(x, youth ? 0.55 : 1.05, 4.2) +
-          0.6 * sigmoid(x, youth ? 3.2 : 4.4, 3.0),
+          0.6 * sigmoid(x, youth ? 3.0 : 4.4, 3.0),
         0,
         1,
       );
@@ -242,15 +250,7 @@ function heartMarks() {
   return state.age < 18 ? NOTE_MGKG.heartYouth : NOTE_MGKG.heartAdult;
 }
 
-function sleepDisruption(mg) {
-  const extra = mg - sleepQuietMg();
-  if (extra <= 0) return 0;
-  const c = extra / kgFromLb(state.weightLb);
-  const cn = c ** 1.3;
-  return cn / (cn + 1.2 ** 1.3);
-}
-
-function activeWindow(id, thresh = 0.2) {
+function activeWindow(id, thresh = 0.12) {
   let on = null;
   let off = null;
   const steps = 240;
@@ -497,9 +497,9 @@ function renderDoseChart() {
   svg.setAttribute("aria-valuetext", `${Math.round(state.doseMg)} milligrams`);
 
   const W = 840;
-  const pad = { l: 16, r: 16, t: 36, b: 4 };
+  const pad = { l: 16, r: 16, t: 6, b: 4 };
   const rowH = 36;
-  const rowsTop = pad.t + 2;
+  const rowsTop = pad.t;
   const H = rowsTop + EFFECTS.length * rowH + pad.b;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   const innerW = W - pad.l - pad.r;
@@ -639,7 +639,7 @@ function renderDoseChart() {
     svgEl("line", {
       x1: xOf(userX),
       x2: xOf(userX),
-      y1: 36,
+      y1: 0,
       y2: axisY,
       stroke: "#f2c14e",
       "stroke-width": 1.8,
@@ -667,7 +667,7 @@ function renderClearChart() {
 
   const W = 840;
   const H = 220;
-  const pad = { l: 20, r: 20, t: 22, b: 28 };
+  const pad = { l: 20, r: 20, t: 22, b: 34 };
   const innerW = W - pad.l - pad.r;
   const innerH = H - pad.t - pad.b;
   const consumeH = parseClock(state.consume);
@@ -729,19 +729,6 @@ function renderClearChart() {
         stroke: "rgba(255, 255, 255, 0.22)",
         "stroke-width": 1,
       }),
-    );
-    label(
-      svg,
-      {
-        x: xOf(nightStart) + 8,
-        y: pad.t + 14,
-        fill: "rgba(244, 238, 228, 0.55)",
-        "font-size": 11,
-        "font-family": "Outfit, sans-serif",
-        "font-weight": 600,
-        "letter-spacing": "0.08em",
-      },
-      `SLEEP  ${formatClock(bedH, true)}–${formatClock(bedH + 8, true)}`,
     );
   }
 
@@ -805,6 +792,23 @@ function renderClearChart() {
 
   const markRoot = el("clear-marks");
   markRoot.replaceChildren();
+  if (nightStart < CLEAR_HOURS) {
+    const bandLeft = xOf(nightStart);
+    const bandRight = xOf(nightEnd);
+    const bandMid = (bandLeft + bandRight) / 2;
+    const bandLabel = document.createElement("span");
+    bandLabel.className = "sleep-band-label";
+    bandLabel.textContent = `SLEEP  ${formatClock(bedH, true)}–${formatClock(bedH + 8, true)}`;
+    bandLabel.style.left = `${(bandMid / W) * 100}%`;
+    bandLabel.style.top = `${(pad.t / H) * 100}%`;
+    markRoot.appendChild(bandLabel);
+    const quietTag = document.createElement("span");
+    quietTag.className = "quiet-label";
+    quietTag.textContent = `sleep disturbance, ${noteMg(NOTE_MGKG.quiet)} mg`;
+    quietTag.style.left = `${(bandMid / W) * 100}%`;
+    quietTag.style.top = `${(yOf(quiet) / H) * 100}%`;
+    markRoot.appendChild(quietTag);
+  }
   for (const item of marks) {
     const x = xOf(item.t);
     const y = yOf(item.mg);
@@ -853,19 +857,19 @@ function renderNotes() {
   const a = NOTE_MGKG.alertness;
   setNote(
     "alertness",
-    `You feel more awake from about ${noteMg(a.from)} to ${noteMg(a.to)} mg, then extra dose adds little. Higher dose does not make you less awake.`,
+    `You feel more awake from about ${noteMg(a.from)} mg, then extra dose adds little after about ${noteMg(a.to)} mg. Higher dose does not make you less awake.`,
   );
 
   const c = NOTE_MGKG.cognition;
   setNote(
     "cognition",
-    `Focus and reaction time get better around ${noteMg(c.betterLo)}–${noteMg(c.betterHi)} mg. By ~${noteMg(c.memoryFail)} mg, memory holds less — shorter digit spans — even though you still feel sharp.`,
+    `Focus and reaction time get better from about ${noteMg(c.from)} mg, best around ${noteMg(c.best)} mg. By ~${noteMg(c.memoryFail)} mg, memory holds less — shorter digit spans — even though you still feel sharp.`,
   );
 
   const e = NOTE_MGKG.endurance;
   setNote(
     "endurance",
-    `Aerobic work starts improving around ${noteMg(e.startLo)}–${noteMg(e.startHi)} mg, then more dose does not buy more output. Same from ${noteMg(e.flatA)} through ${noteMg(e.flatB)} mg; ${noteMg(e.less)} mg does not add more.`,
+    `Aerobic work improves up to around ${noteMg(e.startLo)}–${noteMg(e.startHi)} mg, then more dose does not buy more output. Same from ${noteMg(e.flatA)} through ${noteMg(e.flatB)} mg; ${noteMg(e.less)} mg does not add more.`,
   );
 
   const p = NOTE_MGKG.power;
@@ -888,7 +892,7 @@ function renderNotes() {
   const j = NOTE_MGKG.jitters;
   setNote(
     "jitters",
-    `A little shake starts around ${noteMg(j.little)} mg. By ~${noteMg(j.bigger)} mg holding steady for something like threading a needle gets hard, as you get more awake.`,
+    `A little shake starts around ${noteMg(j.little)} mg. By ~${noteMg(j.bigger)} mg holding steady for something like threading a needle gets hard.`,
   );
 
   setNote(
@@ -903,7 +907,7 @@ function renderNotes() {
   const peakMin = Math.round((peakHours() * 60) / 5) * 5;
   setNote(
     "uptake",
-    `Most of a morning coffee is in your blood within about 45 minutes. The amount in you usually peaks around ${peakMin} minutes at this age — a little under what you swallowed, because clearance has already started. A meal can push that toward an hour and a half.`,
+    `Most of it takes effect within 45 minutes. Peaks around ${peakMin} minutes. A meal can add an hour.`,
   );
 
   const hl = noteHours(halfLifeH());
