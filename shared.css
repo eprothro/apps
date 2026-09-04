@@ -1,0 +1,76 @@
+:root {
+  --bg: #efe6d6;
+  --ink: #1c1410;
+  --ink-soft: #5c5046;
+  --paper: #fff8ee;
+  --rule: #d9cbb6;
+  --stage: #14110e;
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+}
+
+.home {
+  color: #f4eee4;
+  background: var(--stage);
+}
+
+.home html,
+html:has(.home) {
+  background: var(--stage);
+}
+
+.home-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  min-height: 100dvh;
+  padding: max(32px, env(safe-area-inset-top)) 24px max(40px, env(safe-area-inset-bottom));
+}
+
+.home-brand {
+  color: rgba(244, 238, 228, 0.55);
+}
+
+.home-apps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-apps a {
+  padding: 8px 12px;
+  font-family: var(--serif);
+  font-size: clamp(32px, 8vw, 48px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-decoration: none;
+}
+
+.home-apps a:hover {
+  color: #f2c14e;
+}

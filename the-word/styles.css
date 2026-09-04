@@ -1,0 +1,260 @@
+:root {
+  --stage: #14110e;
+  --paper: #f4eee4;
+  --mark: #f2c14e;
+  --header: 48px;
+  --path: 80px;
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--stage);
+  color: var(--paper);
+  font-family: var(--sans);
+}
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  height: calc(var(--header) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 10px 0;
+  background: var(--stage);
+}
+
+.brand {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: rgba(244, 238, 228, 0.55);
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: var(--paper);
+}
+
+.app-name {
+  justify-self: center;
+  padding: 6px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--paper);
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+}
+
+.app-name[aria-expanded="true"] {
+  color: var(--mark);
+}
+
+.top-spacer {
+  width: 44px;
+}
+
+.app-menu:not([hidden]) {
+  position: sticky;
+  top: calc(var(--header) + env(safe-area-inset-top));
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 16px 12px;
+  background: var(--stage);
+  border-bottom: 1px solid rgba(244, 238, 228, 0.08);
+}
+
+.app-menu a {
+  padding: 12px 8px;
+  color: var(--paper);
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.app-menu a[aria-current="page"] {
+  color: var(--mark);
+}
+
+.walk {
+  height: calc(100dvh - var(--header) - env(safe-area-inset-top));
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.station {
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  min-height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.sheet {
+  width: min(38em, 100%);
+  margin: 0 auto;
+  padding: 32px 28px calc(var(--path) + 36px + env(safe-area-inset-bottom));
+}
+
+.station-home {
+  justify-content: flex-start;
+}
+
+.station-home .sheet {
+  padding-top: 20px;
+  padding-bottom: calc(var(--path) + 48px + env(safe-area-inset-bottom));
+}
+
+h1 {
+  margin: 0 0 28px;
+  font-family: var(--serif);
+  font-size: clamp(44px, 11vw, 72px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+h2 {
+  margin: 0 0 8px;
+  color: var(--mark);
+  font-family: var(--serif);
+  font-size: clamp(22px, 4vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  margin: 28px 0 8px;
+  color: rgba(244, 238, 228, 0.5);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h3:first-of-type {
+  margin-top: 28px;
+}
+
+.kicker {
+  margin: 0 0 24px;
+  color: rgba(244, 238, 228, 0.45);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.toc {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 40px;
+}
+
+.toc a {
+  padding: 8px 0;
+  font-family: var(--serif);
+  font-size: clamp(22px, 5vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.toc a:hover {
+  color: var(--mark);
+}
+
+.notice {
+  max-width: 36em;
+  margin: 0;
+  color: rgba(244, 238, 228, 0.4);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sheet p {
+  margin: 0 0 1em;
+  font-family: var(--serif);
+  font-size: clamp(18px, 3.4vw, 22px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.45;
+}
+
+.sheet p:last-child {
+  margin-bottom: 0;
+}
+
+.poem p {
+  margin-bottom: 1.25em;
+}
+
+.indent {
+  padding-left: 1.25em;
+}
+
+.path {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 2px;
+  padding: 10px 8px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--stage) 70%, transparent);
+}
+
+.path a {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 32px;
+  padding: 0 5px;
+  color: rgba(244, 238, 228, 0.4);
+  font-family: var(--serif);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.path a.is-here,
+.path a:hover {
+  color: var(--mark);
+}
+
+@media (min-width: 720px) {
+  .sheet {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+
+  .path a {
+    font-size: 14px;
+    min-width: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walk {
+    scroll-behavior: auto;
+  }
+}

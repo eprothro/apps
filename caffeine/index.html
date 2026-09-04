@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Caffeine · Circle P</title>
+  <meta name="description" content="Caffeine dose response and clearance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../shared.css" />
+  <link rel="stylesheet" href="styles.css?v=22" />
+</head>
+
+<body>
+  <header class="top">
+    <a class="brand" href="../" aria-label="Circle P">
+      <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+        <circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="1.6" />
+        <text x="16" y="21" text-anchor="middle" font-size="15" font-family="Fraunces, Georgia, serif"
+          fill="currentColor">P</text>
+      </svg>
+    </a>
+    <button type="button" class="app-name" id="app-toggle" aria-expanded="false" aria-controls="app-menu">
+      Caffeine
+    </button>
+    <span class="top-spacer" aria-hidden="true"></span>
+  </header>
+
+  <div class="app-menu" id="app-menu" hidden>
+    <a href="./" aria-current="page">Caffeine</a>
+    <a href="../the-word/">The Word</a>
+  </div>
+
+  <main class="fold">
+    <section class="panel" id="dose-panel">
+      <div class="panel-head">
+        <h2>Dose response</h2>
+        <button type="button" class="help" data-flip="dose-panel" data-label="What these curves mean"
+          aria-expanded="false" aria-controls="dose-notes" aria-label="What these curves mean">?</button>
+      </div>
+      <div class="flip">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <div class="dose-wrap">
+              <div class="dose-plot">
+                <svg id="dose-chart" viewBox="0 0 840 338" preserveAspectRatio="none" role="slider"
+                  aria-label="Dose in milligrams" aria-valuemin="0" aria-valuemax="800"></svg>
+                <div id="dose-stamps" class="dose-stamps" aria-hidden="true"></div>
+                <div class="dose-hud" aria-hidden="true">
+                  <div id="dose-pill" class="dose-pill"></div>
+                </div>
+              </div>
+              <div class="dose-scale">
+                <div id="dose-axis" class="dose-axis"></div>
+                <p class="dose-unit">mg/kg</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-back">
+            <p class="notes-lead" id="notes-lead">mg below are for 13 y, 101 lb</p>
+            <dl id="dose-notes">
+              <dt>Alertness</dt>
+              <dd><span data-note="alertness"></span>
+                <span class="cite">Lieberman 2002, men ~24. Childs &amp; de Wit 2006, adults 18–35.</span>
+              </dd>
+              <dt>Cognition</dt>
+              <dd><span data-note="cognition"></span>
+                <span class="cite">Childs &amp; de Wit 2006, adults 18–35. Kaplan 1997.</span>
+              </dd>
+              <dt>Endurance</dt>
+              <dd><span data-note="endurance"></span>
+                <span class="cite">Graham &amp; Spriet 1995, men ~20s. Southward 2018.</span>
+              </dd>
+              <dt>Power</dt>
+              <dd><span data-note="power"></span>
+                <span class="cite">Pallarés 2013, men ~25.</span>
+              </dd>
+              <dt>Speed</dt>
+              <dd><span data-note="speed"></span>
+                <span class="cite">Saville 2018. Salinero 2019. Christensen 2017.</span>
+              </dd>
+              <dt>Mood</dt>
+              <dd><span data-note="mood"></span>
+                <span class="cite">Childs &amp; de Wit 2006. Kaplan 1997. Griffiths, adults.</span>
+              </dd>
+              <dt>Jitters</dt>
+              <dd><span data-note="jitters"></span>
+                <span class="cite">Richardson 1995, adults.</span>
+              </dd>
+              <dt>Anxiety</dt>
+              <dd><span data-note="anxiety"></span>
+                <span class="cite">Childs &amp; de Wit 2006. Childs 2008. Rogers 2010, adults.</span>
+              </dd>
+              <dt>Heart</dt>
+              <dd><span data-note="heart"></span>
+                <span class="cite">Temple 2014, ages 8–9 and 15–17. Mandilaras 2022, mean age 14.5.</span>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="panel clear-panel" id="clear-panel">
+      <div class="clear-head">
+        <div class="panel-head">
+          <h2>Clearance</h2>
+          <button type="button" class="help" data-flip="clear-panel" data-label="What this chart means"
+            aria-expanded="false" aria-controls="clear-notes" aria-label="What this chart means">?</button>
+        </div>
+        <p id="sleep-readout"></p>
+      </div>
+      <div class="flip">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <div class="clear-wrap">
+              <svg id="clear-chart" viewBox="0 0 840 220" preserveAspectRatio="none" role="img"></svg>
+              <div id="clear-marks" class="clear-marks" aria-hidden="true"></div>
+              <div id="clear-axis" class="dose-axis" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="flip-back">
+            <dl id="clear-notes">
+              <dt>Uptake</dt>
+              <dd><span data-note="uptake"></span>
+                <span class="cite">Bonati 1982. Liguori 1997, adults, 400 mg. Brachtel 1988.</span>
+              </dd>
+              <dt>Metabolism rate</dt>
+              <dd><span data-note="decay"></span>
+                <span class="cite">EFSA 2015. Aranda 1979.</span>
+              </dd>
+              <dt>Sleep disturbance</dt>
+              <dd><span data-note="quiet"></span>
+                <span class="cite">Landolt 1995, young men ~70 kg.</span>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="sheet" id="sheet" hidden>
+    <div class="editor" data-editor="age">
+      <div class="chips" id="age-chips"></div>
+      <input id="age-range" type="range" min="8" max="80" step="1" value="13" />
+      <div class="stepper">
+        <button type="button" id="age-down" aria-label="Younger">−</button>
+        <div class="stepper-value">
+          <input id="age-input" type="number" min="8" max="80" step="1" value="13" />
+          <span>yr</span>
+        </div>
+        <button type="button" id="age-up" aria-label="Older">+</button>
+      </div>
+      <p class="meta" aria-hidden="true">&nbsp;</p>
+    </div>
+
+    <div class="editor" data-editor="weight">
+      <div class="chips" id="weight-chips"></div>
+      <input id="weight-range" type="range" min="40" max="400" step="1" value="101" />
+      <div class="stepper">
+        <button type="button" id="weight-down" aria-label="Lighter">−</button>
+        <div class="stepper-value">
+          <input id="weight-input" type="number" min="40" max="400" step="1" value="101" />
+          <span>lb</span>
+        </div>
+        <button type="button" id="weight-up" aria-label="Heavier">+</button>
+      </div>
+      <p class="meta" id="weight-kg">46 kg</p>
+    </div>
+
+    <div class="editor" data-editor="dose">
+      <div class="chips" id="drinks"></div>
+      <input id="dose-range" type="range" min="0" max="400" step="1" value="95" />
+      <div class="stepper">
+        <button type="button" id="dose-down" aria-label="Less">−</button>
+        <div class="stepper-value">
+          <input id="dose-input" type="number" min="0" max="800" step="1" value="95" />
+          <span>mg</span>
+        </div>
+        <button type="button" id="dose-up" aria-label="More">+</button>
+      </div>
+      <p class="meta" id="dose-meta">2.1 mg/kg</p>
+    </div>
+
+    <div class="editor editor-split" data-editor="time">
+      <div class="editor-col">
+        <div class="chips" id="consume-chips"></div>
+        <input id="consume-range" type="range" min="300" max="1320" step="15" value="480" />
+        <div class="stepper">
+          <button type="button" id="consume-down" aria-label="Earlier">−</button>
+          <div class="stepper-value">
+            <span id="consume-display" class="stepper-clock">8am</span>
+          </div>
+          <button type="button" id="consume-up" aria-label="Later">+</button>
+        </div>
+        <p class="meta">consumed</p>
+      </div>
+      <div class="editor-col">
+        <div class="chips" id="bed-chips"></div>
+        <input id="bed-range" type="range" min="1080" max="1560" step="15" value="1320" />
+        <div class="stepper">
+          <button type="button" id="bed-down" aria-label="Earlier bedtime">−</button>
+          <div class="stepper-value">
+            <span id="bed-display" class="stepper-clock">10pm</span>
+          </div>
+          <button type="button" id="bed-up" aria-label="Later bedtime">+</button>
+        </div>
+        <p class="meta">bedtime</p>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tray" aria-label="Inputs">
+    <div class="tray-inner">
+      <button type="button" class="tray-item" data-sheet="age">
+        <strong id="tray-age">13</strong>
+        <span>age</span>
+      </button>
+      <button type="button" class="tray-item" data-sheet="weight">
+        <strong id="tray-weight">101 lb</strong>
+        <span>weight</span>
+      </button>
+      <button type="button" class="tray-item" data-sheet="dose">
+        <strong id="tray-dose">95 mg</strong>
+        <span>dose</span>
+      </button>
+      <button type="button" class="tray-item" data-sheet="time">
+        <strong id="tray-time">8am</strong>
+        <span>consumed</span>
+      </button>
+    </div>
+  </nav>
+
+  <script src="app.js?v=35"></script>
+</body>
+
+</html>
