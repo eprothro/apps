@@ -144,11 +144,11 @@ Not a dose ridge. **Remaining mg/kg at lights-out.**
 - Gardiner 2023, _Sleep Med Rev_, 24 trials: TST −0.2 min per extra 1 mg _dose_; no breakpoint. Cut-offs back-calculate to ~0.45 mg/kg residual. Conservative meta-regression — not a demonstrated leftover floor.
 - Gardiner 2025, _Sleep_: 100 mg at 4 h pre-bed (~0.77 mg/kg leftover) was **null** on objective and subjective sleep. Landolt remains the lowest positive residual.
 
-**Quiet line:** **0.28 mg/kg remaining** (~20 mg @70 kg, ~13 mg at 101 lb). That is _below_ Landolt’s whole demonstrated band — “probably will not disturb most people,” not the 25 mg that _did_ cut sleep. Do **not** reuse 18–25 mg as an absolute for a smaller body. Sensitivity that would move the line is ADORA2A / habit, not age.
+**Quiet line:** **0.28 mg/kg remaining** (~20 mg @70 kg, ~13 mg at 101 lb, ~9 mg at 72 lb). That is body size, not an age left-shift — a 13-year-old at 154 lb gets 20 mg, same as an adult. Landolt’s 25 mg was leftover in ~70 kg men (a concentration, ~0.35–0.47 mg/kg). 20 mg as an absolute for a 101 lb kid is 0.44 mg/kg, inside that band. Do **not** reuse 20–25 mg as a fixed leftover for a smaller body. Sensitivity that would move the line is ADORA2A / habit, not age.
 
 **Age:** same 0.28 mg/kg. Kids clear faster (half-life). Reichert 2021, boys 14–17, 80 mg 4 h pre-bed (~0.65 mg/kg leftover): **null** — no youth left-shift. Robillard 2015: middle age loses more TST, but only at **400 mg near bed** (~20× this line); Drapeau 2006 at 200 mg was similar by age. Do not put that on the card.
 
-Red fill on the part of the night still above the dotted quiet line. `SLEEP {bed}–{wake}` and `sleep disturbance, {quiet} mg` are both centered in the night band — do not left-align, or a 3pm cup pins them to the left edge.
+Red fill on the part of the night still above the dotted quiet line. `SLEEP {bed}–{wake}` stays centered in the night band. `sleep disruption, {quiet} mg` sits on the right of the chart, above the line.
 
 ## Uptake (clearance chart rise)
 
@@ -226,4 +226,4 @@ Key first, then a wrinkle. Cites last. Facts, not chart colors, dotted lines, or
 
 **Metabolism rate.** Caffeine halves about every {t½} hours at this age, every 5 hours in adults. Newborns are much slower. Adults: every {t½} hours, no “vs adults” clause. — EFSA 2015. Aranda 1979.
 
-**Sleep disturbance.** Sleep usually looks normal below about {quiet} mg leftover at this weight. About 25 mg leftover cut sleep in young men ~70 kg. — Landolt 1995, young men ~70 kg.
+**Sleep disruption.** Sleep usually looks normal below about {quiet} mg leftover at this weight. About 25 mg leftover cut sleep in young men ~70 kg. — Landolt 1995, young men ~70 kg.

@@ -417,7 +417,8 @@ body {
 }
 
 .quiet-label {
-  transform: translate(-50%, -130%);
+  transform: translate(-100%, -130%);
+  text-align: right;
   font-size: 10px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;

@@ -793,22 +793,20 @@ function renderClearChart() {
   const markRoot = el("clear-marks");
   markRoot.replaceChildren();
   if (nightStart < CLEAR_HOURS) {
-    const bandLeft = xOf(nightStart);
-    const bandRight = xOf(nightEnd);
-    const bandMid = (bandLeft + bandRight) / 2;
+    const bandMid = (xOf(nightStart) + xOf(nightEnd)) / 2;
     const bandLabel = document.createElement("span");
     bandLabel.className = "sleep-band-label";
     bandLabel.textContent = `SLEEP  ${formatClock(bedH, true)}–${formatClock(bedH + 8, true)}`;
     bandLabel.style.left = `${(bandMid / W) * 100}%`;
     bandLabel.style.top = `${(pad.t / H) * 100}%`;
     markRoot.appendChild(bandLabel);
-    const quietTag = document.createElement("span");
-    quietTag.className = "quiet-label";
-    quietTag.textContent = `sleep disturbance, ${noteMg(NOTE_MGKG.quiet)} mg`;
-    quietTag.style.left = `${(bandMid / W) * 100}%`;
-    quietTag.style.top = `${(yOf(quiet) / H) * 100}%`;
-    markRoot.appendChild(quietTag);
   }
+  const quietTag = document.createElement("span");
+  quietTag.className = "quiet-label";
+  quietTag.textContent = `sleep disruption, ${noteMg(NOTE_MGKG.quiet)} mg`;
+  quietTag.style.left = `${((W - pad.r) / W) * 100}%`;
+  quietTag.style.top = `${(yOf(quiet) / H) * 100}%`;
+  markRoot.appendChild(quietTag);
   for (const item of marks) {
     const x = xOf(item.t);
     const y = yOf(item.mg);
