@@ -647,9 +647,10 @@ function renderDoseChart() {
   );
 
   const pill = el("dose-pill");
+  const handle = el("dose-handle");
   const pillX = clamp(xOf(userX), pad.l + 36, W - pad.r - 36);
   pill.textContent = `${Math.round(state.doseMg)} mg`;
-  pill.style.left = `${(pillX / W) * 100}%`;
+  handle.style.left = `${(pillX / W) * 100}%`;
 
   const axis = el("dose-axis");
   axis.replaceChildren();
@@ -996,21 +997,26 @@ function bind() {
   });
 
   const svg = el("dose-chart");
-  svg.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    drag.live = true;
-    svg.setPointerCapture(event.pointerId);
-    applyDoseFromEvent(event);
-  });
-  svg.addEventListener("pointermove", (event) => {
-    if (!drag.live) return;
-    applyDoseFromEvent(event);
-  });
+  const handle = el("dose-handle");
   const endDrag = () => {
     drag.live = false;
   };
-  svg.addEventListener("pointerup", endDrag);
-  svg.addEventListener("pointercancel", endDrag);
+  const startDrag = (event) => {
+    event.preventDefault();
+    drag.live = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    applyDoseFromEvent(event);
+  };
+  const moveDrag = (event) => {
+    if (!drag.live) return;
+    applyDoseFromEvent(event);
+  };
+  for (const node of [handle, svg]) {
+    node.addEventListener("pointerdown", startDrag);
+    node.addEventListener("pointermove", moveDrag);
+    node.addEventListener("pointerup", endDrag);
+    node.addEventListener("pointercancel", endDrag);
+  }
 
   document.querySelectorAll(".tray-item").forEach((button) => {
     button.addEventListener("click", () => {
