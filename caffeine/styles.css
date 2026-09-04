@@ -195,6 +195,7 @@ body {
 .flip-back {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -207,6 +208,11 @@ body {
 
 .panel.is-flipped .flip-front {
   pointer-events: none;
+}
+
+.panel.is-flipped .dose-handle,
+.panel.is-flipped .clear-marks {
+  visibility: hidden;
 }
 
 .flip-back {
@@ -339,9 +345,11 @@ body {
   bottom: 0;
   z-index: 3;
   width: 48px;
-  transform: translateX(-50%);
+  margin-left: -24px;
   cursor: ew-resize;
   touch-action: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .dose-pill {
