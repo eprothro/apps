@@ -66,7 +66,13 @@ const BED_PRESETS = [
 
 const EFFECTS = [
   { id: "alertness", label: "alertness", kind: "help", color: "#4ecf8a" },
-  { id: "cognition", label: "cognition", kind: "help", color: "#3dba7a" },
+  {
+    id: "cognition",
+    label: "cognition",
+    kind: "help",
+    color: "#3dba7a",
+    down: "#e2564a",
+  },
   { id: "endurance", label: "endurance", kind: "help", color: "#8fd36a" },
   { id: "power", label: "power", kind: "help", color: "#b5d45c" },
   { id: "mood", label: "mood", kind: "help", color: "#c6d36a" },
@@ -131,6 +137,8 @@ const NOTE_MGKG = {
   landoltLeftMg: 25,
 };
 
+const STORE_KEY = "circle-p-caffeine";
+
 const state = {
   age: 13,
   weightLb: 101,
@@ -140,6 +148,48 @@ const state = {
   bedtime: "22:00",
   sheet: null,
 };
+
+function isClock(value) {
+  if (typeof value !== "string" || !/^\d{2}:\d{2}$/.test(value)) return false;
+  const [h, m] = value.split(":").map(Number);
+  return h >= 0 && h <= 23 && m >= 0 && m <= 59;
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (!saved || typeof saved !== "object") return;
+    if (Number.isFinite(saved.age))
+      state.age = clamp(Math.round(saved.age), 8, 80);
+    if (Number.isFinite(saved.weightLb)) {
+      state.weightLb = clamp(saved.weightLb, 40, 400);
+    }
+    if (Number.isFinite(saved.doseMg))
+      state.doseMg = clamp(saved.doseMg, 0, 800);
+    if (isClock(saved.consume)) state.consume = saved.consume;
+    if (isClock(saved.bedtime)) state.bedtime = saved.bedtime;
+    matchDrink();
+  } catch {
+    return;
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify({
+        age: state.age,
+        weightLb: state.weightLb,
+        doseMg: state.doseMg,
+        consume: state.consume,
+        bedtime: state.bedtime,
+      }),
+    );
+  } catch {
+    return;
+  }
+}
 
 const drag = { live: false };
 
@@ -187,9 +237,12 @@ function sigmoid(x, mid, steep) {
   return 1 / (1 + Math.exp(-steep * (x - mid)));
 }
 
+const COGNITION_FLOOR = 0.2;
+
 function cognitionAt(x) {
-  const raw = hill(x, 1.2, 2) - 1.9 * hill(x, 6.4, 3);
-  return clamp(raw / 0.7059, 0, 1);
+  const raw = (hill(x, 1.2, 2) - 1.9 * hill(x, 6.4, 3)) / 0.7059;
+  if (raw >= 0) return Math.min(raw, 1);
+  return -COGNITION_FLOOR * Math.tanh(-raw / COGNITION_FLOOR);
 }
 
 function effectAt(id, x) {
@@ -511,20 +564,31 @@ function renderDoseChart() {
     const top = rowsTop + i * rowH;
     const yOf = (v) => top + rowH - 7 - v * (rowH - 12);
     const window = activeWindow(effect.id);
-    const points = [];
+    const above = [];
+    const below = [];
     const active = [];
     for (let s = 0; s <= steps; s += 1) {
       const x = (s / steps) * MAX_MGKG;
-      const point = { x: xOf(x), y: yOf(effectAt(effect.id, x)) };
-      points.push(point);
+      const v = effectAt(effect.id, x);
+      const point = { x: xOf(x), y: yOf(v) };
+      (v >= 0 ? above : below).push(point);
       const inside =
         window.on !== null &&
         x >= window.on &&
         (window.off === null || x <= window.off);
       if (inside) active.push(point);
+      const nextX = ((s + 1) / steps) * MAX_MGKG;
+      const nextV = s < steps ? effectAt(effect.id, nextX) : v;
+      if (v >= 0 !== nextV >= 0) {
+        const t = v / (v - nextV);
+        const cross = { x: xOf(x + t * (nextX - x)), y: yOf(0) };
+        above.push(cross);
+        below.push(cross);
+      }
     }
     const now = effectAt(effect.id, userX);
     const live = now >= 0.2;
+    const nowColor = now < 0 ? effect.down : effect.color;
 
     if (i > 0) {
       svg.appendChild(
@@ -542,14 +606,48 @@ function renderDoseChart() {
       svgEl("path", {
         d:
           pathFrom([
-            ...points,
-            { x: xOf(MAX_MGKG), y: yOf(0) },
-            { x: xOf(0), y: yOf(0) },
+            ...above,
+            { x: above[above.length - 1].x, y: yOf(0) },
+            { x: above[0].x, y: yOf(0) },
           ]) + " Z",
         fill: effect.color,
         opacity: 0.07,
       }),
     );
+    if (below.length > 1) {
+      svg.appendChild(
+        svgEl("path", {
+          d:
+            pathFrom([
+              ...below,
+              { x: below[below.length - 1].x, y: yOf(0) },
+              { x: below[0].x, y: yOf(0) },
+            ]) + " Z",
+          fill: effect.down,
+          opacity: 0.3,
+        }),
+      );
+      svg.appendChild(
+        svgEl("line", {
+          x1: below[0].x,
+          x2: W - pad.r,
+          y1: yOf(0),
+          y2: yOf(0),
+          stroke: "rgba(244, 238, 228, 0.32)",
+          "stroke-width": 1,
+          "stroke-dasharray": "5 5",
+        }),
+      );
+      svg.appendChild(
+        svgEl("path", {
+          d: pathFrom(below),
+          fill: "none",
+          stroke: effect.down,
+          "stroke-width": 1.8,
+          "stroke-linecap": "round",
+        }),
+      );
+    }
     if (active.length > 1) {
       svg.appendChild(
         svgEl("path", {
@@ -566,7 +664,7 @@ function renderDoseChart() {
     }
     svg.appendChild(
       svgEl("path", {
-        d: pathFrom(points),
+        d: pathFrom(above),
         fill: "none",
         stroke: effect.color,
         "stroke-width": 1.4,
@@ -615,19 +713,19 @@ function renderDoseChart() {
       svgEl("circle", {
         cx: xOf(userX),
         cy: yOf(now),
-        r: live ? 4.4 : 3,
-        fill: effect.color,
+        r: live || now < 0 ? 4.4 : 3,
+        fill: nowColor,
         stroke: "#14110e",
         "stroke-width": 1.4,
-        opacity: now < 0.04 ? 0.25 : 1,
+        opacity: Math.abs(now) < 0.04 ? 0.25 : 1,
       }),
     );
     const stamp = document.createElement("div");
     stamp.className = "ridge-stamp";
     stamp.style.top = `${(top / H) * 100}%`;
     stamp.style.height = `${(rowH / H) * 100}%`;
-    stamp.style.color = effect.color;
-    stamp.style.opacity = live ? "0.58" : "0.3";
+    stamp.style.color = nowColor;
+    stamp.style.opacity = live || now < 0 ? "0.58" : "0.3";
     const name = document.createElement("span");
     name.textContent = effect.label;
     stamp.append(name);
@@ -804,7 +902,7 @@ function renderClearChart() {
   }
   const quietTag = document.createElement("span");
   quietTag.className = "quiet-label";
-  quietTag.textContent = `sleep disruption, ${noteMg(NOTE_MGKG.quiet)} mg`;
+  quietTag.textContent = `disruption, ${noteMg(NOTE_MGKG.quiet)} mg`;
   quietTag.style.left = `${((W - pad.r) / W) * 100}%`;
   quietTag.style.top = `${(yOf(quiet) / H) * 100}%`;
   markRoot.appendChild(quietTag);
@@ -918,7 +1016,7 @@ function renderNotes() {
 
   setNote(
     "quiet",
-    `Sleep usually looks normal below about ${noteMg(NOTE_MGKG.quiet)} mg leftover at this weight. About ${NOTE_MGKG.landoltLeftMg} mg leftover cut sleep in young men ~70 kg.`,
+    `You can fall asleep fine and still sleep less, and more lightly. Sleep usually looks normal below about ${noteMg(NOTE_MGKG.quiet)} mg leftover at this weight. About ${NOTE_MGKG.landoltLeftMg} mg leftover cut sleep in young men ~70 kg.`,
   );
 }
 
@@ -927,6 +1025,7 @@ function render() {
   renderDoseChart();
   renderClearChart();
   renderNotes();
+  saveState();
 }
 
 function applyDoseFromEvent(event) {
@@ -1004,7 +1103,11 @@ function bind() {
   const startDrag = (event) => {
     event.preventDefault();
     drag.live = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      /* capture is nicety; the move listeners still fire */
+    }
     applyDoseFromEvent(event);
   };
   const moveDrag = (event) => {
@@ -1029,6 +1132,10 @@ function bind() {
   });
 
   el("scrim").addEventListener("click", closeMenus);
+  el("sheet-dismiss").addEventListener("click", closeMenus);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenus();
+  });
   el("app-toggle").addEventListener("click", () => {
     const menu = el("app-menu");
     const open = menu.hidden;
@@ -1097,5 +1204,6 @@ function bind() {
   });
 }
 
+loadState();
 bind();
 render();

@@ -44,9 +44,17 @@ Vigilance/RT keep looking good longer. Working memory and harder tasks fail firs
 - Kaplan 1997: digit-symbol and tapping **better at 250 than 500 mg**.
 - McLellan, Caldwell & Lieberman 2016 review: adult military/athlete samples, 3–6 mg/kg often cited as useful window; >6 no added benefit.
 
-**Landmarks (adult mg/kg):** onset ~0.5, peak ~2.5, memory fail 450 @70 kg (~6.4), baseline ~6.5.
+**Landmarks (adult mg/kg):** onset ~0.5, peak ~2.5, memory fail 450 @70 kg (~6.4), crosses below baseline ~6.5.
 
-**Model:** `(hill(x, 1.2, 2) − 1.9 × hill(x, 6.4, 3)) / 0.7059`. Peak at 2.5; ~0 at the Childs 450 mark; baseline by 6.5. **No youth left-shift** (no multi-dose adolescent cognition series). Do not use a wide cost Hill — that hid the fall past the memory-fail mark.
+**Model:** `raw = (hill(x, 1.2, 2) − 1.9 × hill(x, 6.4, 3)) / 0.7059`, capped at 1. Peak at 2.5; crosses zero at 6.48, on the Childs 450 mark. **No youth left-shift** (no multi-dose adolescent cognition series). Do not use a wide cost Hill — that hid the fall past the memory-fail mark.
+
+**Below baseline is the only ridge that goes negative.** Childs measured a memory task **impaired against placebo** at 450 mg — a sign, below zero, not a return to normal. Since the ridge is load-weighted, the hard tasks that fail are what the curve is tracking, so past the memory-fail mark it belongs under the line. Clamping it at 0 read as "back to normal," which no paper supports.
+
+Depth is **not** measured, so it must not be modeled as a slope. Negative `raw` is squashed through `−0.2 × tanh(−raw / 0.2)`: it saturates at **−0.2** and flattens. That claims the sign (worse than no caffeine) and refuses the magnitude. Kaplan 500 mg (~7.1 mg/kg) is the last dose anyone measured; everything right of it is the same shallow floor, on purpose. Do not deepen the floor with dose and do not let it reach the row edge.
+
+Rendered with the negative run in `#e2564a` against the ridge's own `#3dba7a`, under a dashed zero rule that spans **only** the negative run — left of the crossing the fill's own bottom edge is already zero, so a full-width rule there is redundant clutter. The dash matches the clearance chart's quiet line: dashed means threshold. The row label and the dose marker take the red too, but only when the current dose actually sits below zero, so at a normal dose you see a green reading with the red cliff still drawn ahead of you.
+
+Costs live on their own ridges — this red is a benefit that turned into a cost, which is why it is on the cognition row and not on jitters. The card copy needs no change: it already says memory holds less by that mark "even though you still feel sharp," which is exactly the alertness ridge staying green while this one goes under.
 
 ### endurance — rise, then hard plateau
 
@@ -140,7 +148,7 @@ No age-13 speed series. Same mg/kg as the parent ridges. Speed is a **fact only*
 
 Not a dose ridge. **Remaining mg/kg at lights-out.**
 
-- Landolt 1995, _Brain Res_, young men ~20–30 y, ~70–75 kg: 200 mg at ~07:00, bed ~16 h later. **Measured** saliva 3 µmol/L at lights-out ≈ **24–33 mg in a 70 kg man** (~0.35–0.47 mg/kg). Kinetic leftover ~22 mg at t½=5 h to ~31 mg at t½=6 h. **TST and efficiency still down.**
+- Landolt 1995, _Brain Res_, young men ~20–30 y, ~70–75 kg: 200 mg at ~07:00, bed ~16 h later. **Measured** saliva 3 µmol/L at lights-out ≈ **24–33 mg in a 70 kg man** (~0.35–0.47 mg/kg). Kinetic leftover ~22 mg at t½=5 h to ~31 mg at t½=6 h. **TST and efficiency down.** EEG: less low-delta, more spindles. They did **not** report extra awakenings. Authors: leftover at bed, or blunted sleep pressure from caffeine during the day — either way the night looks worse. Bedtime 100 mg (Landolt, _Neuropsychopharmacology_ 1995) is a different paper: latency up, stage 4 down.
 - Gardiner 2023, _Sleep Med Rev_, 24 trials: TST −0.2 min per extra 1 mg _dose_; no breakpoint. Cut-offs back-calculate to ~0.45 mg/kg residual. Conservative meta-regression — not a demonstrated leftover floor.
 - Gardiner 2025, _Sleep_: 100 mg at 4 h pre-bed (~0.77 mg/kg leftover) was **null** on objective and subjective sleep. Landolt remains the lowest positive residual.
 
@@ -148,7 +156,7 @@ Not a dose ridge. **Remaining mg/kg at lights-out.**
 
 **Age:** same 0.28 mg/kg. Kids clear faster (half-life). Reichert 2021, boys 14–17, 80 mg 4 h pre-bed (~0.65 mg/kg leftover): **null** — no youth left-shift. Robillard 2015: middle age loses more TST, but only at **400 mg near bed** (~20× this line); Drapeau 2006 at 200 mg was similar by age. Do not put that on the card.
 
-Red fill on the part of the night still above the dotted quiet line. `SLEEP {bed}–{wake}` stays centered in the night band. `sleep disruption, {quiet} mg` sits on the right of the chart, above the line.
+Red fill on the part of the night still above the dotted quiet line. `SLEEP {bed}–{wake}` stays centered in the night band. `disruption, {quiet} mg` sits on the right of the chart, above the line.
 
 ## Uptake (clearance chart rise)
 
@@ -190,7 +198,7 @@ Key first, then a wrinkle. Cites last. Facts, not chart colors, dotted lines, or
 | Effect      | Marks                                   | Source                             |
 | ----------- | --------------------------------------- | ---------------------------------- |
 | alertness   | 0.5, 180→2.6 @70 kg                     | Lieberman 1987 32 mg; 2002 plateau |
-| cognition   | 0.5, 2.5, 450 @70 kg                    | onset with RT; peak; Childs memory |
+| cognition   | 0.5, 2.5, 450 @70 kg (zero crossing)    | onset with RT; peak; Childs memory |
 | endurance   | 2, 3, 6, 9                              | Graham & Spriet; Southward         |
 | power       | 3, 9                                    | Pallarés light vs 75–90% 1RM       |
 | mood        | 1.0, 150 / 300 / 450 @70 kg             | Smit onset; Childs peak; Griffiths |
@@ -226,4 +234,4 @@ Key first, then a wrinkle. Cites last. Facts, not chart colors, dotted lines, or
 
 **Metabolism rate.** Caffeine halves about every {t½} hours at this age, every 5 hours in adults. Newborns are much slower. Adults: every {t½} hours, no “vs adults” clause. — EFSA 2015. Aranda 1979.
 
-**Sleep disruption.** Sleep usually looks normal below about {quiet} mg leftover at this weight. About 25 mg leftover cut sleep in young men ~70 kg. — Landolt 1995, young men ~70 kg.
+**Sleep disruption.** You can fall asleep fine and still sleep less, and more lightly. Sleep usually looks normal below about {quiet} mg leftover at this weight. About 25 mg leftover cut sleep in young men ~70 kg. — Landolt 1995, young men ~70 kg. TST + lighter EEG, not “waking up.” Do not write WASO or “deep sleep.”

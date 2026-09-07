@@ -37,7 +37,7 @@
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="../shared.css?v=3" />
-  <link rel="stylesheet" href="styles.css?v=30" />
+  <link rel="stylesheet" href="styles.css?v=34" />
 </head>
 
 <body>
@@ -173,6 +173,9 @@
   <div class="scrim" id="scrim" hidden></div>
 
   <div class="sheet" id="sheet" hidden>
+    <button type="button" class="sheet-dismiss" id="sheet-dismiss" aria-label="Close editor">
+      <span aria-hidden="true"></span>
+    </button>
     <div class="editor" data-editor="age">
       <div class="chips" id="age-chips"></div>
       <input id="age-range" type="range" min="8" max="80" step="1" value="13" />
@@ -246,25 +249,37 @@
   <nav class="tray" aria-label="Inputs">
     <div class="tray-inner">
       <button type="button" class="tray-item" data-sheet="age">
-        <strong id="tray-age">13</strong>
+        <span class="tray-field">
+          <strong id="tray-age">13</strong>
+          <span class="tray-caret" aria-hidden="true"></span>
+        </span>
         <span>age</span>
       </button>
       <button type="button" class="tray-item" data-sheet="weight">
-        <strong id="tray-weight">101 lb</strong>
+        <span class="tray-field">
+          <strong id="tray-weight">101 lb</strong>
+          <span class="tray-caret" aria-hidden="true"></span>
+        </span>
         <span>weight</span>
       </button>
       <button type="button" class="tray-item" data-sheet="dose">
-        <strong id="tray-dose">95 mg</strong>
+        <span class="tray-field">
+          <strong id="tray-dose">95 mg</strong>
+          <span class="tray-caret" aria-hidden="true"></span>
+        </span>
         <span>dose</span>
       </button>
       <button type="button" class="tray-item" data-sheet="time">
-        <strong id="tray-time">8am</strong>
+        <span class="tray-field">
+          <strong id="tray-time">8am</strong>
+          <span class="tray-caret" aria-hidden="true"></span>
+        </span>
         <span>consumed</span>
       </button>
     </div>
   </nav>
 
-  <script src="app.js?v=42"></script>
+  <script src="app.js?v=50"></script>
 </body>
 
 </html>
