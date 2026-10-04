@@ -1,6 +1,7 @@
 const LB_PER_KG = 2.2046226218;
 const KA = 4; // 1/h — fasted coffee; Tmax ≈ 50 min. Fed meal ≈ 2.
 const MAX_MGKG = 10;
+const MAX_DOSE_MG = Math.round(MAX_MGKG * (400 / LB_PER_KG));
 const CLEAR_HOURS = 20;
 
 const TYPICAL = {
@@ -186,6 +187,121 @@ function saveState() {
         bedtime: state.bedtime,
       }),
     );
+  } catch {
+    return;
+  }
+}
+
+// ?age=&lb=&mg=&at=&bed= shares the tray. Present keys beat localStorage.
+// Unreadable values keep the saved or default one. Numbers and clocks clamp.
+function readParam(params, name) {
+  for (const [key, value] of params.entries()) {
+    if (key.toLowerCase() === name) return value;
+  }
+  return null;
+}
+
+function parseClamped(raw, min, max) {
+  if (typeof raw !== "string") return null;
+  const text = raw.trim();
+  if (text.length > 12 || !/^[-+]?\d+(?:\.\d+)?$/.test(text)) return null;
+  const n = Number(text);
+  if (Number.isNaN(n)) return null;
+  if (!Number.isFinite(n)) return n < 0 ? min : max;
+  return clamp(Math.round(n), min, max);
+}
+
+function parseShareClock(raw) {
+  if (typeof raw !== "string") return null;
+  const text = raw.trim().toLowerCase().replace(/\s+/g, "");
+  if (!text || text.length > 16) return null;
+
+  const ampm = text.match(/^(\d{1,2})(?:[:.\-](\d{2}))?([ap])m$/);
+  if (ampm) {
+    let hours = Number(ampm[1]);
+    const minutes = ampm[2] === undefined ? 0 : Number(ampm[2]);
+    if (hours < 1 || hours > 12 || minutes > 59) return null;
+    if (ampm[3] === "a") hours = hours === 12 ? 0 : hours;
+    else if (hours !== 12) hours += 12;
+    return minutesToClock(hours * 60 + minutes);
+  }
+
+  const h24 = text.match(/^(\d{1,2})[:.\-](\d{2})$/);
+  if (h24) {
+    const hours = Number(h24[1]);
+    const minutes = Number(h24[2]);
+    if (hours > 23 || minutes > 59) return null;
+    return minutesToClock(hours * 60 + minutes);
+  }
+
+  if (/^\d{3,4}$/.test(text)) {
+    const padded = text.padStart(4, "0");
+    const hours = Number(padded.slice(0, 2));
+    const minutes = Number(padded.slice(2));
+    if (hours > 23 || minutes > 59) return null;
+    return minutesToClock(hours * 60 + minutes);
+  }
+
+  return null;
+}
+
+function applyClock(raw, min, max, toSliderMinutes) {
+  const clock = parseShareClock(raw);
+  if (!clock) return null;
+  return minutesToClock(clamp(toSliderMinutes(clock), min, max));
+}
+
+function shareClock(hhmm) {
+  const [h, m] = hhmm.split(":").map(Number);
+  const suffix = h >= 12 ? "pm" : "am";
+  const hr12 = h % 12 === 0 ? 12 : h % 12;
+  return m === 0
+    ? `${hr12}${suffix}`
+    : `${hr12}-${String(m).padStart(2, "0")}${suffix}`;
+}
+
+function applyUrl() {
+  const params = new URLSearchParams(location.search);
+  const age = readParam(params, "age");
+  if (age !== null) {
+    const next = parseClamped(age, 8, 80);
+    if (next !== null) state.age = next;
+  }
+  const lb = readParam(params, "lb");
+  if (lb !== null) {
+    const next = parseClamped(lb, 40, 400);
+    if (next !== null) state.weightLb = next;
+  }
+  const mg = readParam(params, "mg");
+  if (mg !== null) {
+    const next = parseClamped(mg, 0, MAX_DOSE_MG);
+    if (next !== null) state.doseMg = next;
+  }
+  const at = readParam(params, "at");
+  if (at !== null) {
+    const next = applyClock(at, 5 * 60, 22 * 60, clockToMinutes);
+    if (next) state.consume = next;
+  }
+  const bed = readParam(params, "bed");
+  if (bed !== null) {
+    const next = applyClock(bed, 18 * 60, 26 * 60, bedSliderMinutes);
+    if (next) state.bedtime = next;
+  }
+  matchDrink();
+}
+
+function stateQuery() {
+  const age = clamp(Math.round(state.age), 8, 80);
+  const lb = clamp(Math.round(state.weightLb), 40, 400);
+  const mg = clamp(Math.round(state.doseMg), 0, MAX_DOSE_MG);
+  return `age=${age}&lb=${lb}&mg=${mg}&at=${shareClock(state.consume)}&bed=${shareClock(state.bedtime)}`;
+}
+
+function syncUrl() {
+  const next = `?${stateQuery()}${location.hash}`;
+  if (`${location.search}${location.hash}` === next) return;
+  try {
+    history.replaceState(null, "", next);
   } catch {
     return;
   }
@@ -1026,6 +1142,7 @@ function render() {
   renderClearChart();
   renderNotes();
   saveState();
+  syncUrl();
 }
 
 function applyDoseFromEvent(event) {
@@ -1079,6 +1196,54 @@ function closeMenus() {
   el("app-menu").hidden = true;
   el("app-toggle").setAttribute("aria-expanded", "false");
   render();
+}
+
+let shareTimer = 0;
+
+function fallbackCopy(url) {
+  try {
+    const input = document.createElement("textarea");
+    input.value = url;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.opacity = "0";
+    document.body.appendChild(input);
+    input.select();
+    const ok = document.execCommand("copy");
+    input.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+function markShare(ok) {
+  const button = el("share");
+  const tip = el("share-tip");
+  button.classList.toggle("is-copied", ok);
+  tip.hidden = false;
+  tip.textContent = ok ? "Copied" : "Copy failed";
+  el("share-status").textContent = ok ? "Link copied" : "Could not copy link";
+  button.setAttribute("aria-label", ok ? "Link copied" : "Copy link");
+  clearTimeout(shareTimer);
+  shareTimer = setTimeout(() => {
+    button.classList.remove("is-copied");
+    tip.hidden = true;
+    el("share-status").textContent = "";
+    button.setAttribute("aria-label", "Copy link");
+  }, 1400);
+}
+
+function copyLink() {
+  const url = location.href;
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(url).then(
+      () => markShare(true),
+      () => markShare(fallbackCopy(url)),
+    );
+    return;
+  }
+  markShare(fallbackCopy(url));
 }
 
 function bind() {
@@ -1202,8 +1367,11 @@ function bind() {
     state.bedtime = minutesToClock(Number(event.target.value));
     render();
   });
+
+  el("share").addEventListener("click", copyLink);
 }
 
 loadState();
+applyUrl();
 bind();
 render();

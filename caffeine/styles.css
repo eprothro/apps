@@ -73,8 +73,63 @@ a {
   color: var(--mark);
 }
 
-.top-spacer {
+.share {
+  position: relative;
+  display: grid;
+  place-items: center;
   width: 44px;
+  height: 44px;
+  justify-self: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(244, 238, 228, 0.55);
+  cursor: pointer;
+}
+
+.share:hover,
+.share:focus-visible {
+  color: var(--paper);
+}
+
+.share.is-copied {
+  color: var(--mark);
+}
+
+.share:focus-visible {
+  outline: 1px solid var(--mark);
+  outline-offset: -6px;
+  border-radius: 8px;
+}
+
+.share-check {
+  display: none;
+}
+
+.share.is-copied .share-icon {
+  display: none;
+}
+
+.share.is-copied .share-check {
+  display: block;
+}
+
+.share-tip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% - 4px);
+  transform: translateY(-50%);
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--mark);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .app-menu:not([hidden]) {
